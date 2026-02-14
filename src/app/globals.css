@@ -1,0 +1,65 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-background: #050505;
+  --color-foreground: #ededed;
+  
+  --color-primary: #7C3AED;
+  --color-primary-foreground: #ffffff;
+  
+  --color-secondary: #d946ef;
+  --color-secondary-foreground: #ffffff;
+  
+  --color-accent: #1e1b4b;
+  --color-accent-foreground: #c7d2fe;
+
+  --animate-fade-in: fade-in 0.5s ease-out;
+  --animate-fade-in-up: fade-in-up 0.7s ease-out;
+  --animate-glow: glow 2s ease-in-out infinite alternate;
+
+  @keyframes fade-in {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes fade-in-up {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes glow {
+    from { box-shadow: 0 0 10px -10px var(--color-primary); }
+    to { box-shadow: 0 0 20px 5px var(--color-primary); }
+  }
+}
+
+/* Custom Utilities */
+@layer utilities {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-lg border border-white/10 shadow-xl;
+  }
+  
+  .glass-card-hover {
+    @apply hover:bg-white/10 hover:border-white/20 transition-all duration-300;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
+  }
+
+  .bg-grid-pattern {
+    background-image: linear-gradient(to right, #ffffff05 1px, transparent 1px),
+                      linear-gradient(to bottom, #ffffff05 1px, transparent 1px);
+    background-size: 40px 40px;
+  }
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
