@@ -1,0 +1,45 @@
+# PRs into main must come from staging or carry the hotfix label.
+# Everything else targets staging. Labels are read live from the API, so if
+# you add `hotfix` after opening the PR, re-run this job.
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main, staging]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr-target-guard:
+    name: pr-target-guard
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: PRs into main come from staging or carry the hotfix label
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          read -r base head hotfix < <(gh pr view "$PR" \
+            --json baseRefName,headRefName,labels \
+            --jq '"\(.baseRefName) \(.headRefName) \([.labels[].name] | index("hotfix") != null)"')
+          if [ "$base" != "main" ]; then
+            echo "PR targets $base. OK."
+          elif [ "$head" = "staging" ]; then
+            echo "Release PR from staging into main. OK."
+          elif [ "$hotfix" = "true" ]; then
+            echo "::warning::Hotfix PR from $head straight into main."
+          else
+            echo "::error::PRs must target staging, not main. Change the base branch to staging (or add the hotfix label and re-run this job)."
+            exit 1
+          fi
